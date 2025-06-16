@@ -1,0 +1,38 @@
+[
+{
+  "directory": "/home/drift/Desktop/coding_projects/nvnopara/build",
+  "command": "/usr/bin/g++ -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc -g -g -std=gnu++17 -o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/backend.cpp.o -c /home/drift/Desktop/coding_projects/nvnopara/src/backend.cpp",
+  "file": "/home/drift/Desktop/coding_projects/nvnopara/src/backend.cpp",
+  "output": "CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/backend.cpp.o"
+},
+{
+  "directory": "/home/drift/Desktop/coding_projects/nvnopara/build",
+  "command": "/usr/bin/g++ -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc -g -g -std=gnu++17 -o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o -c /home/drift/Desktop/coding_projects/nvnopara/src/main.cpp",
+  "file": "/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp",
+  "output": "CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o"
+},
+{
+  "directory": "/home/drift/Desktop/coding_projects/nvnopara/build",
+  "command": "/usr/bin/g++ -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc -g -g -std=gnu++17 -o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o -c /home/drift/Desktop/coding_projects/nvnopara/src/op.cpp",
+  "file": "/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp",
+  "output": "CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o"
+},
+{
+  "directory": "/home/drift/Desktop/coding_projects/nvnopara/build",
+  "command": "/usr/bin/g++ -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc -g -g -std=gnu++17 -o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o -c /home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp",
+  "file": "/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp",
+  "output": "CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o"
+},
+{
+  "directory": "/home/drift/Desktop/coding_projects/nvnopara/build",
+  "command": "/usr/bin/g++ -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc -g -g -std=gnu++17 -o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cpp.o -c /home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cpp",
+  "file": "/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cpp",
+  "output": "CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cpp.o"
+},
+{
+  "directory": "/home/drift/Desktop/coding_projects/nvnopara/build",
+  "command": "/usr/bin/g++ -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc -g -g -std=gnu++17 -o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o -c /home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp",
+  "file": "/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp",
+  "output": "CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o"
+}
+]

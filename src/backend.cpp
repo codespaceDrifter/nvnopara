@@ -13,6 +13,10 @@ void printBackend() {
 }
 
 Backend detectBackend() {
+    //seed the random number generator, not related to the backend
+    srand(time(nullptr));
+
+    //check if cuda available
     if (cudaGetDeviceCount(nullptr) > 0) {
         return Backend::CUDA;
     }

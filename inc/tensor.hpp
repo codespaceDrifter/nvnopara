@@ -2,7 +2,10 @@
 #define TENSOR_HPP
 
 #include <vector>
-
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <cassert>
 
 class Tensor {
 public:
@@ -35,6 +38,10 @@ public:
         return this->idx(indices_vec);
     }
 
+    Tensor* broadcast(std::vector<int> newShape);
+
+    void randomize(float min, float max);
+    void print();
 
     ~Tensor();
     

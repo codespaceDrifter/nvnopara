@@ -27,12 +27,16 @@ Tensor* assertReducibleCreate(Tensor* originalTensor, std::vector<int>newShape){
 
 Tensor* add(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_add(a, b, result);
+            CPU_add(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_add(a, b, result);
+            CUDA_add(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -40,12 +44,16 @@ Tensor* add(Tensor* a, Tensor* b) {
 
 Tensor* sub(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_sub(a, b, result);
+            CPU_sub(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_sub(a, b, result);
+            CUDA_sub(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -53,12 +61,16 @@ Tensor* sub(Tensor* a, Tensor* b) {
 
 Tensor* mul(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_mul(a, b, result);
+            CPU_mul(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_mul(a, b, result);
+            CUDA_mul(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -66,12 +78,16 @@ Tensor* mul(Tensor* a, Tensor* b) {
 
 Tensor* div(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_div(a, b, result);
+            CPU_div(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_div(a, b, result);
+            CUDA_div(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -79,12 +95,16 @@ Tensor* div(Tensor* a, Tensor* b) {
 
 Tensor* pow(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_pow(a, b, result);
+            CPU_pow(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_pow(a, b, result);
+            CUDA_pow(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -92,12 +112,16 @@ Tensor* pow(Tensor* a, Tensor* b) {
 
 Tensor* equal(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_equal(a, b, result);
+            CPU_equal(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_equal(a, b, result);
+            CUDA_equal(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -105,12 +129,16 @@ Tensor* equal(Tensor* a, Tensor* b) {
 
 Tensor* lessThan(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_lessThan(a, b, result);
+            CPU_lessThan(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_lessThan(a, b, result);
+            CUDA_lessThan(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -118,12 +146,16 @@ Tensor* lessThan(Tensor* a, Tensor* b) {
 
 Tensor* greaterThan(Tensor* a, Tensor* b) {
     Tensor* result = assertShapeSameCreate(a,b);
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_greaterThan(a, b, result);
+            CPU_greaterThan(aData, bData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_greaterThan(a, b, result);
+            CUDA_greaterThan(aData, bData, n, resultData);
             break;
     }
     return result;
@@ -131,12 +163,15 @@ Tensor* greaterThan(Tensor* a, Tensor* b) {
 
 Tensor* sin(Tensor* a) {
     Tensor* result = new Tensor(a->shape);
+    float* aData = a->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_sin(a, result);
+            CPU_sin(aData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_sin(a, result);
+            CUDA_sin(aData, n, resultData);
             break;
     }
     return result;
@@ -144,12 +179,15 @@ Tensor* sin(Tensor* a) {
 
 Tensor* cos(Tensor* a) {
     Tensor* result = new Tensor(a->shape);
+    float* aData = a->data;
+    float* resultData = result->data;
+    int n = result->size;
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_cos(a, result);
+            CPU_cos(aData, n, resultData);
             break;
         case Backend::CUDA:
-            CUDA_cos(a, result);
+            CUDA_cos(aData, n, resultData);
             break;
     }
     return result;
@@ -161,12 +199,22 @@ Tensor* matmul(Tensor* a, Tensor* b) {
     assert(a->shape[1] && b->shape[0]);
     std::vector<int> resultShape = {a->shape[0], b->shape[1]};
     Tensor* result = new Tensor(resultShape);
+
+    float* aData = a->data;
+    float* bData = b->data;
+    float* resultData = result->data;
+
+    //k is the shared common dimension not in the result shape
+    int m = a->shape[0];
+    int n = b->shape[1];
+    int k = a->shape[1];
+
     switch (currentBackend) {
         case Backend::CPU:
-            CPU_matmul(a, b, result);
+            CPU_matmul(aData, bData, m, n, k, resultData);
             break;
         case Backend::CUDA:
-            CUDA_matmul(a, b, result);
+            CUDA_matmul(aData, bData, m, n, k, resultData);
             break;
     }
     return result;

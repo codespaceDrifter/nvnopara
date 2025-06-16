@@ -1,0 +1,3 @@
+/home/drift/Desktop/coding_projects/nvnopara/build/CMakeFiles/main.dir
+/home/drift/Desktop/coding_projects/nvnopara/build/CMakeFiles/edit_cache.dir
+/home/drift/Desktop/coding_projects/nvnopara/build/CMakeFiles/rebuild_cache.dir
