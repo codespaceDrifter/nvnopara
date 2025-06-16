@@ -1,13 +1,13 @@
 #ifndef OP_HPP
 #define OP_HPP
 
-// checks if shape compatible then pass parameters to seperate backend functions
+// checks if shape compatible then pass parameters to separate device functions
 // assumes all of these are NOT inplace
 
 #include <vector>
 #include <cassert>
 #include "tensor.hpp"
-#include "backend.hpp"
+#include "device.hpp"
 #include "opCPU.hpp"
 #include "opCUDA.hpp"
 
