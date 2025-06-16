@@ -1,13 +1,13 @@
 #include <iostream>
 #include "tensor.hpp"
 #include <vector>
-#include "backend.hpp"
+#include "device.hpp"
 #include "op.hpp"
 
 int main() {
-    printBackend();
-    currentBackend = Backend::CPU;
-    printBackend();
+    printDevice();
+    currentDevice = Device::CPU;
+    printDevice();
 
 
 
