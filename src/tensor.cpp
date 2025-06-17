@@ -31,6 +31,12 @@ Tensor::~Tensor() {
     }
 }
 
+void Tensor::arrange(float start, float step) {
+    for (int i = 0; i < this->size; ++i){
+        this->data[i] = start + i * step;
+    }
+}
+
 void Tensor::randomize(float min, float max) {
     for (int i = 0; i< this->size; ++i){
         float cur = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (max - min) +min;

@@ -155,6 +155,21 @@ __global__ void minKernel(float*a, float*result, int dim, int* aShape, int* resu
     }
 }
 
+//this is a naive and slow matmul kernel. no tiles, no tensor cores
+
+__global__ void matmulKernel(float* A, float* B, float* C, int M, int N, int K) {
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (row < M && col < N) {
+        float sum = 0.0f;
+        for (int k = 0; k < K; k++) {
+            sum += A[row * K + k] * B[k * N + col];
+        }
+        C[row * N + col] = sum;
+    }
+}
+
 void reduceOpParameterGen (Tensor* a, Tensor* result, int** d_aShape, int** d_resultStride){
 
     int* aShape = a->shape.data();
@@ -224,7 +239,9 @@ void CUDA_greaterThan(float* a, float* b, int n, float* result) {
 }
 
 void CUDA_matmul(float* a, float* b, int m, int n, int k, float* result) {
-
+    dim3 blockDim(16, 16);
+    dim3 gridDim((n+15)/16, (m+15)/16);
+    matmulKernel<<<gridDim, blockDim>>>(a, b, result, m, n, k);
 }
 
 void CUDA_sin(float* a, int n, float* result) {

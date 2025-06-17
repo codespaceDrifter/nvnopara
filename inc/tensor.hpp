@@ -57,6 +57,7 @@ public:
     void toCUDA();
 
     void randomize(float min, float max);
+    void arrange(float start = 0, float step = 1);
     void print();
 
     ~Tensor();

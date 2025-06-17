@@ -9,11 +9,11 @@
 
 int main() {
 
-    Tensor* a = new Tensor({1'000, 1'000});
-    a->randomize(0, 10);
+    Tensor* a = new Tensor({1'000'000'000});
+    a->arrange(0,0.1);
 
-    Tensor* b = new Tensor({1'000, 1'000});
-    b->randomize(0, 10);
+    Tensor* b = new Tensor({1'000'000'000});
+    b->arrange(0,0.1);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -22,6 +22,8 @@ int main() {
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "Elapsed time: " << duration.count() << " seconds\n";
+
+    delete c_CPU;
 
     a->toCUDA();
     b->toCUDA();
@@ -34,6 +36,8 @@ int main() {
 
     std::chrono::duration<double> duration2 = end2 - start2;
     std::cout << "Elapsed time: " << duration2.count() << " seconds\n";
+
+    delete c_CUDA;
 
 
 
