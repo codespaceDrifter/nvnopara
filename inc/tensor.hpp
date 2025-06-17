@@ -6,6 +6,19 @@
 #include <cstdlib>
 #include <ctime>
 #include <cassert>
+#include <cuda_runtime.h>
+
+
+
+
+
+enum class Device {
+    CPU,
+    CUDA,
+};
+
+//seed the RNG
+static int _ = (srand(time(nullptr)),0);
 
 class Tensor {
 public:
@@ -40,6 +53,9 @@ public:
 
     Tensor* broadcast(std::vector<int> newShape);
 
+    void toCPU();
+    void toCUDA();
+
     void randomize(float min, float max);
     void print();
 
@@ -49,6 +65,7 @@ public:
     std::vector<int> shape;
     int size;
     std::vector<int> stride;
+    Device device;
 };
 
 #endif // TENSOR_HPP

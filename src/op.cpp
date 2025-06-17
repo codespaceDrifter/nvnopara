@@ -1,6 +1,11 @@
 #include "op.hpp"
 #include "tensor.hpp"
-#include "device.hpp"
+
+
+Device opDevice (Tensor* a, Tensor* b){
+    assert (a->device == b->device);
+    return a->device;
+}
 
 Tensor* assertShapeSameCreate (Tensor* a, Tensor* b){
     assert (a->shape == b->shape);
@@ -31,12 +36,14 @@ Tensor* add(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_add(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_add(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_add(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -48,12 +55,14 @@ Tensor* sub(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_sub(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_sub(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_sub(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -65,12 +74,14 @@ Tensor* mul(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_mul(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_mul(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_mul(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -82,12 +93,14 @@ Tensor* div(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_div(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_div(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_div(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -99,12 +112,14 @@ Tensor* pow(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_pow(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_pow(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_pow(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -116,12 +131,14 @@ Tensor* equal(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_equal(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_equal(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_equal(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -133,12 +150,14 @@ Tensor* lessThan(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_lessThan(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_lessThan(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_lessThan(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -150,12 +169,14 @@ Tensor* greaterThan(Tensor* a, Tensor* b) {
     float* bData = b->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_greaterThan(aData, bData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_greaterThan(aData, bData, n, resultData);
+            result->toCUDA();
+            CUDA_greaterThan(aData, bData, n, result->data);
             break;
     }
     return result;
@@ -166,12 +187,13 @@ Tensor* sin(Tensor* a) {
     float* aData = a->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    switch (a->device) {
         case Device::CPU:
             CPU_sin(aData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_sin(aData, n, resultData);
+            result->toCUDA();
+            CUDA_sin(aData, n, result->data);
             break;
     }
     return result;
@@ -182,12 +204,13 @@ Tensor* cos(Tensor* a) {
     float* aData = a->data;
     float* resultData = result->data;
     int n = result->size;
-    switch (currentDevice) {
+    switch (a->device) {
         case Device::CPU:
             CPU_cos(aData, n, resultData);
             break;
         case Device::CUDA:
-            CUDA_cos(aData, n, resultData);
+            result->toCUDA();
+            CUDA_cos(aData, n, result->data);
             break;
     }
     return result;
@@ -209,12 +232,14 @@ Tensor* matmul(Tensor* a, Tensor* b) {
     int n = b->shape[1];
     int k = a->shape[1];
 
-    switch (currentDevice) {
+    Device device = opDevice(a, b);
+    switch (device) {
         case Device::CPU:
             CPU_matmul(aData, bData, m, n, k, resultData);
             break;
         case Device::CUDA:
-            CUDA_matmul(aData, bData, m, n, k, resultData);
+            result->toCUDA();
+            CUDA_matmul(aData, bData, m, n, k, result->data);
             break;
     }
     return result;
@@ -223,11 +248,12 @@ Tensor* matmul(Tensor* a, Tensor* b) {
 
 Tensor* sum(Tensor* a, std::vector<int> newShape) {
     Tensor* result = assertReducibleCreate(a, newShape);
-    switch (currentDevice) {
+    switch (a->device) {
         case Device::CPU:
             CPU_sum(a, result);
             break;
         case Device::CUDA:
+            result->toCUDA();
             CUDA_sum(a, result);
             break;
     }
@@ -238,11 +264,12 @@ Tensor* max(Tensor* a, std::vector<int> newShape) {
 
     Tensor* result = assertReducibleCreate(a, newShape);
 
-    switch (currentDevice) {
+    switch (a->device) {
         case Device::CPU:
             CPU_max(a, result);
             break;
         case Device::CUDA:
+            result->toCUDA();
             CUDA_max(a, result);
             break;
     }
@@ -253,11 +280,12 @@ Tensor* min(Tensor* a, std::vector<int> newShape) {
 
     Tensor* result = assertReducibleCreate(a, newShape);
 
-    switch (currentDevice) {
+    switch (a->device) {
         case Device::CPU:
             CPU_min(a, result);
             break;
         case Device::CUDA:
+            result->toCUDA();
             CUDA_min(a, result);
             break;
     }

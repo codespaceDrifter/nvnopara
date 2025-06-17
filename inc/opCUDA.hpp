@@ -3,6 +3,7 @@
 
 #include "tensor.hpp"
 #include <vector>
+#include <cuda_runtime.h>
 
 void CUDA_add(float* a, float* b, int n, float* result);
 

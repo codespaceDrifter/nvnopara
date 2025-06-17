@@ -215,6 +215,9 @@ nvnopara,_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 nvnopara,_SOURCE_DIR:STATIC=/home/drift/Desktop/coding_projects/nvnopara/cmake
 
+//Dependencies for the target
+tensor_lib_LIB_DEPENDS:STATIC=general;cuda;general;cudart;
+
 
 ########################
 # INTERNAL cache entries

@@ -20,10 +20,15 @@ Tensor::Tensor(std::vector<int> shape) {
             this->stride[i] = 0;
         }
     }
+    this->device = Device::CPU;
 }
 
 Tensor::~Tensor() {
-    delete[] this->data;
+    if (this->device == Device::CPU) {
+        delete[] this->data;
+    } else if (this->device == Device::CUDA) {
+        cudaFree(this->data);
+    }
 }
 
 void Tensor::randomize(float min, float max) {
@@ -33,8 +38,35 @@ void Tensor::randomize(float min, float max) {
     }
 }
 
+void Tensor::toCPU() {
+    switch (this->device) {
+        case Device::CPU:
+            break;
+        case Device::CUDA:
+            float* tempData = new float[this->size];
+            cudaMemcpy(tempData, this->data, this->size * sizeof(float), cudaMemcpyDeviceToHost);
+            cudaFree(this->data);
+            this->data = tempData;
+            break;
+    }
+
+    this->device = Device::CPU;
+    
+}
+
+void Tensor::toCUDA() {
+    if (this->device == Device::CPU) {
+        float* cudaData;
+        cudaMalloc(&cudaData, this->size * sizeof(float));
+        cudaMemcpy(cudaData, this->data, this->size * sizeof(float), cudaMemcpyHostToDevice);
+        delete[] this->data;  // Free the CPU memory
+        this->data = cudaData;
+    }
+    this->device = Device::CUDA;
+}
 
 void Tensor::print(){
+    assert(this->device == Device::CPU);
     //outputs the shape
     std::cout << "shape: (";
     for (int i = 0; i < this->shape.size(); ++i) {

@@ -7,15 +7,15 @@
 #include <vector>
 #include <cassert>
 #include "tensor.hpp"
-#include "device.hpp"
 #include "opCPU.hpp"
 #include "opCUDA.hpp"
 
-
+Device opDevice (Tensor* a, Tensor* b);
 
 Tensor* assertReducibleCreate(Tensor* originalTensor, std::vector<int>newShape);
 
 Tensor* assertShapeSameCreate (Tensor* a, Tensor* b);
+
 
 Tensor* add(Tensor* a, Tensor* b);
 

@@ -1156,6 +1156,18 @@
 			],
 			"type" : "STATIC",
 			"value" : "/home/drift/Desktop/coding_projects/nvnopara/cmake"
+		},
+		{
+			"name" : "tensor_lib_LIB_DEPENDS",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Dependencies for the target"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "general;cuda;general;cudart;"
 		}
 	],
 	"kind" : "cache",

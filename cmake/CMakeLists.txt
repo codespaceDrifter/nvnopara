@@ -9,6 +9,7 @@ set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -G -g")
 
 
 set (HEADERS
@@ -17,18 +18,18 @@ set (HEADERS
 include_directories(${HEADERS})
 
 file (GLOB_RECURSE TENSOR_SRC ${PROJECT_ROOT_DIR}/src/*.cpp)
-
+file (GLOB_RECURSE CUDA_SRC ${PROJECT_ROOT_DIR}/src/*.cu)
 
 set(SOURCES
   ${TENSOR_SRC}
+  ${CUDA_SRC}
 )
 
-
-
-add_executable(main ${SOURCES})
-
+add_executable(main ${PROJECT_ROOT_DIR}/test/main.cpp ${SOURCES})
 target_link_libraries(main PRIVATE cuda cudart)
 
+add_executable(speed ${PROJECT_ROOT_DIR}/test/speed.cpp ${SOURCES})
+target_link_libraries(speed PRIVATE cuda cudart)
 
 #commands to build this:
 # (in cmake folder)
