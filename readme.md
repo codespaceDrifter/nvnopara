@@ -1,22 +1,14 @@
 C++ library that does Tensor Calculations  
 nvnopara stands for nano parallel: a minimum functionality library that stills allow GPU tensor ops
 Targets CUDA or CPU  
-this is meant for physics simulations or math this is NOT meant for Machine Learning
-there are NO broadcasting
-there is still shape to be passed in for Matmul and reduceops but normal element ops should NOT use stride calculations
 there are NO views, every tensor memory is contiguous
-no codegen/ laziness / fused operations for now just simple basic kernels  
+there are NO codegen. element op kernels are fused with abstract syntax tree and switch op statements. 
 
 used in my svmbolsolve, phvsicsim, and mvndspace libraries  
 
 
 #to do
-
-spend whole week on this make this actually good and worthy of being actually used in other projects (phvsicsim)
-fuse ALL the same shape element ops together!
-kernel fusion without codegen. use sth like
-
-
+1: kernel fusion
 __global__ void fusedKernel(float* inputs[], float* result, int n, int* ops, int numOps) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n) {
@@ -36,8 +28,7 @@ __global__ void fusedKernel(float* inputs[], float* result, int n, int* ops, int
     }
 }
 
-
-allow broadcasting, but do it with checks like a bool passed in whether to use broadcasting or not
+2: allow broadcasting, but do it with checks like a bool passed in whether to use broadcasting or not
 bool needsBroadcast
 
-tiled matmul
+3: tiled matmul
