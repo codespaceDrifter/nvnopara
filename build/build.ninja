@@ -49,12 +49,12 @@ cmake_ninja_workdir = /home/drift/Desktop/coding_projects/nvnopara/build/
 
 build cmake_object_order_depends_target_main: phony || CMakeFiles/main.dir
 
-build CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o: CXX_COMPILER__main_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/main.cpp || cmake_object_order_depends_target_main
-  DEP_FILE = CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o.d
+build CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/test/main.cpp.o: CXX_COMPILER__main_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/test/main.cpp || cmake_object_order_depends_target_main
+  DEP_FILE = CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/test/main.cpp.o.d
   FLAGS = -g -g -std=gnu++17
   INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
   OBJECT_DIR = CMakeFiles/main.dir
-  OBJECT_FILE_DIR = CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src
+  OBJECT_FILE_DIR = CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/test
 
 build CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o: CXX_COMPILER__main_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/op.cpp || cmake_object_order_depends_target_main
   DEP_FILE = CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o.d
@@ -92,7 +92,7 @@ build CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA
 #############################################
 # Link the executable bin/main
 
-build bin/main: CXX_EXECUTABLE_LINKER__main_Debug CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu.o
+build bin/main: CXX_EXECUTABLE_LINKER__main_Debug CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/test/main.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o CMakeFiles/main.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu.o
   FLAGS = -g -g
   LINK_LIBRARIES = -lcuda  -lcudart  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
   LINK_PATH = -L/usr/lib/x86_64-linux-gnu/stubs   -L/usr/lib/gcc/x86_64-linux-gnu/12
@@ -117,13 +117,6 @@ build CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/test/spee
   INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
   OBJECT_DIR = CMakeFiles/speed.dir
   OBJECT_FILE_DIR = CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/test
-
-build CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o: CXX_COMPILER__speed_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/main.cpp || cmake_object_order_depends_target_speed
-  DEP_FILE = CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o.d
-  FLAGS = -g -g -std=gnu++17
-  INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
-  OBJECT_DIR = CMakeFiles/speed.dir
-  OBJECT_FILE_DIR = CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src
 
 build CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o: CXX_COMPILER__speed_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/op.cpp || cmake_object_order_depends_target_speed
   DEP_FILE = CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o.d
@@ -161,7 +154,7 @@ build CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUD
 #############################################
 # Link the executable bin/speed
 
-build bin/speed: CXX_EXECUTABLE_LINKER__speed_Debug CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/test/speed.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/main.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu.o
+build bin/speed: CXX_EXECUTABLE_LINKER__speed_Debug CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/test/speed.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o CMakeFiles/speed.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu.o
   FLAGS = -g -g
   LINK_LIBRARIES = -lcuda  -lcudart  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
   LINK_PATH = -L/usr/lib/x86_64-linux-gnu/stubs   -L/usr/lib/gcc/x86_64-linux-gnu/12
@@ -170,6 +163,68 @@ build bin/speed: CXX_EXECUTABLE_LINKER__speed_Debug CMakeFiles/speed.dir/home/dr
   PRE_LINK = :
   TARGET_FILE = bin/speed
   TARGET_PDB = speed.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target correct
+
+
+#############################################
+# Order-only phony target for correct
+
+build cmake_object_order_depends_target_correct: phony || CMakeFiles/correct.dir
+
+build CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/test/correct.cpp.o: CXX_COMPILER__correct_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/test/correct.cpp || cmake_object_order_depends_target_correct
+  DEP_FILE = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/test/correct.cpp.o.d
+  FLAGS = -g -g -std=gnu++17
+  INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
+  OBJECT_DIR = CMakeFiles/correct.dir
+  OBJECT_FILE_DIR = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/test
+
+build CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o: CXX_COMPILER__correct_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/op.cpp || cmake_object_order_depends_target_correct
+  DEP_FILE = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o.d
+  FLAGS = -g -g -std=gnu++17
+  INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
+  OBJECT_DIR = CMakeFiles/correct.dir
+  OBJECT_FILE_DIR = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src
+
+build CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o: CXX_COMPILER__correct_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp || cmake_object_order_depends_target_correct
+  DEP_FILE = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o.d
+  FLAGS = -g -g -std=gnu++17
+  INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
+  OBJECT_DIR = CMakeFiles/correct.dir
+  OBJECT_FILE_DIR = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src
+
+build CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o: CXX_COMPILER__correct_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp || cmake_object_order_depends_target_correct
+  DEP_FILE = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o.d
+  FLAGS = -g -g -std=gnu++17
+  INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
+  OBJECT_DIR = CMakeFiles/correct.dir
+  OBJECT_FILE_DIR = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src
+
+build CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu.o: CUDA_COMPILER__correct_unscanned_Debug /home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu || cmake_object_order_depends_target_correct
+  DEP_FILE = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu.o.d
+  FLAGS = -g -G -g -std=c++17
+  INCLUDES = -I/home/drift/Desktop/coding_projects/nvnopara/cmake/../inc
+  OBJECT_DIR = CMakeFiles/correct.dir
+  OBJECT_FILE_DIR = CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target correct
+
+
+#############################################
+# Link the executable bin/correct
+
+build bin/correct: CXX_EXECUTABLE_LINKER__correct_Debug CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/test/correct.cpp.o CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/op.cpp.o CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCPU.cpp.o CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/tensor.cpp.o CMakeFiles/correct.dir/home/drift/Desktop/coding_projects/nvnopara/src/opCUDA.cu.o
+  FLAGS = -g -g
+  LINK_LIBRARIES = -lcuda  -lcudart  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
+  LINK_PATH = -L/usr/lib/x86_64-linux-gnu/stubs   -L/usr/lib/gcc/x86_64-linux-gnu/12
+  OBJECT_DIR = CMakeFiles/correct.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = bin/correct
+  TARGET_PDB = correct.dbg
 
 
 #############################################
@@ -197,6 +252,8 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
+build correct: phony bin/correct
+
 build main: phony bin/main
 
 build speed: phony bin/speed
@@ -209,7 +266,7 @@ build speed: phony bin/speed
 #############################################
 # Folder: /home/drift/Desktop/coding_projects/nvnopara/build
 
-build all: phony bin/main bin/speed
+build all: phony bin/main bin/speed bin/correct
 
 # =============================================================================
 # Built-in targets

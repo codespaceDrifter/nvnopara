@@ -13,8 +13,9 @@ used in my svmbolsolve, phvsicsim, and mvndspace libraries
 #to do
 
 spend whole week on this make this actually good and worthy of being actually used in other projects (phvsicsim)
-
+fuse ALL the same shape element ops together!
 kernel fusion without codegen. use sth like
+
 
 __global__ void fusedKernel(float* inputs[], float* result, int n, int* ops, int numOps) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -37,5 +38,6 @@ __global__ void fusedKernel(float* inputs[], float* result, int n, int* ops, int
 
 
 allow broadcasting, but do it with checks like a bool passed in whether to use broadcasting or not
+bool needsBroadcast
 
 tiled matmul

@@ -31,6 +31,9 @@ target_link_libraries(main PRIVATE cuda cudart)
 add_executable(speed ${PROJECT_ROOT_DIR}/test/speed.cpp ${SOURCES})
 target_link_libraries(speed PRIVATE cuda cudart)
 
+add_executable(correct ${PROJECT_ROOT_DIR}/test/correct.cpp ${SOURCES})
+target_link_libraries(correct PRIVATE cuda cudart)
+
 #commands to build this:
 # (in cmake folder)
 #mkdir build

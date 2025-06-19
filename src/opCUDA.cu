@@ -1,21 +1,28 @@
 #include "opCUDA.hpp"
 
+#define MAX_DIM 6
+#define BLOCK_SIZE 256
 
-__device__ int idxConversion (int idx, int dim, int* oldShape, int* newStride){
 
-    int resultIdx = 0;
-    int endStart = dim - 1;
-    for (int i = endStart; i >= 0; i--) {
-        int tempResultIdx = idx % oldShape[i] * newStride[i];
-        resultIdx += tempResultIdx;
-        idx = idx / oldShape[i];
+__device__ void flatToIndice (int idx, int dim, int* shape, int* indice){
+    int lastDim = dim - 1;
+    for (int i = lastDim; i >= 0; i--) {
+        indice[i] = idx % shape[i];
+        idx = idx / shape[i];
     }
+}
 
-
+// indiceDim must be greater or equal than strideDim
+__device__ int indiceToFlat (int indiceDim, int* indice, int strideDim, int* stride){
+    int resultIdx = 0;
+    int offset = indiceDim - strideDim;
+    for (int i = 0; i < strideDim; i++) {
+        resultIdx += indice[i + offset] * stride[i];
+    }
     return resultIdx;
 }
 
-__global__ void fillKernel(float* result, float value, int n){
+__global__ void fillKernel(int n, float* result, float value){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = value;
@@ -23,81 +30,84 @@ __global__ void fillKernel(float* result, float value, int n){
 }
 
 
-__global__ void addKernel(float*a, float*b, float*result, int n){
+__global__ void addKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = a[idx] + b[idx];
     }
 }
 
-__global__ void subKernel(float*a, float*b, float*result, int n){
+
+__global__ void subKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = a[idx] - b[idx];
     }
 }
 
-__global__ void mulKernel(float*a, float*b, float*result, int n){
+__global__ void mulKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = a[idx] * b[idx];
     }
 }
 
-__global__ void divKernel(float*a, float*b, float*result, int n){
+__global__ void divKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = a[idx] / b[idx];
     }
 }
 
-__global__ void powKernel(float*a, float*b, float*result, int n){
+__global__ void powKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = pow(a[idx], b[idx]);
     }
 }
 
-__global__ void equalKernel(float*a, float*b, float*result, int n){
+__global__ void equalKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = a[idx] == b[idx] ? 1.0f : 0.0f;
     }
 }
 
-__global__ void lessThanKernel(float*a, float*b, float*result, int n){
+__global__ void lessThanKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = a[idx] < b[idx] ? 1.0f : 0.0f;
     }
 }
 
-__global__ void greaterThanKernel(float*a, float*b, float*result, int n){
+__global__ void greaterThanKernel(int n, float*a, float*b, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = a[idx] > b[idx] ? 1.0f : 0.0f;
     }
 }
 
-__global__ void sinKernel(float*a, float*result, int n){
+__global__ void sinKernel(int n, float*a, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = sinf(a[idx]);
     }
 }
 
-__global__ void cosKernel(float*a, float*result, int n){
+__global__ void cosKernel(int n, float*a, float*result){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
         result[idx] = cosf(a[idx]);
     }
 }
 
-__global__ void sumKernel(float*a, float*result, int dim, int* aShape, int* resultStride, int n){
+__global__ void sumKernel(int n, float*a, float*result, int shapeDim, int* aShape,int strideDim, int* resultStride){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (idx < n){
-        int resultIdx = idxConversion(idx, dim, aShape, resultStride);
+        int indice[MAX_DIM];
+        flatToIndice(idx, shapeDim, aShape, indice);
+        int resultIdx = indiceToFlat(shapeDim, indice, strideDim, resultStride);
         atomicAdd(&result[resultIdx], a[idx]);
     }
 }
@@ -126,10 +136,12 @@ __device__ void atomicMax(float* address, float val){
     } while (assumed != old);
 }
 
-__global__ void maxKernel(float*a, float*result, int dim, int* aShape, int* resultStride, int n){
+__global__ void maxKernel(int n, float*a, float*result, int shapeDim, int* aShape,int strideDim, int* resultStride){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
-        int resultIdx = idxConversion(idx, dim, aShape, resultStride);
+        int indice[MAX_DIM];
+        flatToIndice(idx, shapeDim, aShape, indice);
+        int resultIdx = indiceToFlat(shapeDim, indice, strideDim, resultStride);
         atomicMax(&result[resultIdx], a[idx]);
     }
 }
@@ -147,17 +159,19 @@ __device__ void atomicMin(float* address, float val){
     } while (assumed != old);
 }
 
-__global__ void minKernel(float*a, float*result, int dim, int* aShape, int* resultStride, int n){
+__global__ void minKernel(int n, float*a, float*result, int shapeDim, int* aShape,int strideDim, int* resultStride){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n){
-        int resultIdx = idxConversion(idx, dim, aShape, resultStride);
-        result[resultIdx] = fminf(result[resultIdx], a[idx]);
+        int indice[MAX_DIM];
+        flatToIndice(idx, shapeDim, aShape, indice);
+        int resultIdx = indiceToFlat(shapeDim, indice, strideDim, resultStride);
+        atomicMin(&result[resultIdx], a[idx]);
     }
 }
 
 //this is a naive and slow matmul kernel. no tiles, no tensor cores
 
-__global__ void matmulKernel(float* A, float* B, float* C, int M, int N, int K) {
+__global__ void matmulKernel(int M, int N, int K, float* A, float* B, float* C) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     
@@ -170,163 +184,108 @@ __global__ void matmulKernel(float* A, float* B, float* C, int M, int N, int K) 
     }
 }
 
-void reduceOpParameterGen (Tensor* a, Tensor* result, int** d_aShape, int** d_resultStride){
-
-    int* aShape = a->shape.data();
-    int dim = a->shape.size();
-
-    std::vector<int> extendResultStride(dim, 0);
-    std::copy(result->stride.begin(), result->stride.end(),
-        extendResultStride.end() - result->stride.size());
-    int* resultStride = extendResultStride.data();
-
-    cudaMalloc(d_aShape, dim * sizeof(int));
-    cudaMalloc(d_resultStride, dim * sizeof(int));
-
-    cudaMemcpy(*d_aShape, aShape, dim * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(*d_resultStride, resultStride, dim * sizeof(int), cudaMemcpyHostToDevice);
-
-}
-
-
-void CUDA_add(float* a, float* b, int n, float* result) {
+void CUDA_add(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    addKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    addKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
 
-void CUDA_sub(float* a, float* b, int n, float* result) {
+void CUDA_sub(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    subKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    subKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
-void CUDA_mul(float* a, float* b, int n, float* result) {
+void CUDA_mul(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    mulKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    mulKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
-void CUDA_div(float* a, float* b, int n, float* result) {
+void CUDA_div(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    divKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    divKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
-void CUDA_pow(float* a, float* b, int n, float* result) {
+void CUDA_pow(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    powKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    powKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
-void CUDA_equal(float* a, float* b, int n, float* result) {
+void CUDA_equal(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    equalKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    equalKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
-void CUDA_lessThan(float* a, float* b, int n, float* result) {
+void CUDA_lessThan(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    lessThanKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    lessThanKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
-void CUDA_greaterThan(float* a, float* b, int n, float* result) {
+void CUDA_greaterThan(int n, float* a, float* b, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    greaterThanKernel<<<numBlocks, blockSize>>>(a, b, result, n);
+    greaterThanKernel<<<numBlocks, blockSize>>>(n, a, b, result);
 }
 
-void CUDA_matmul(float* a, float* b, int m, int n, int k, float* result) {
+void CUDA_matmul(int m, int n, int k, float* a, float* b, float* result) {
     dim3 blockDim(16, 16);
     dim3 gridDim((n+15)/16, (m+15)/16);
-    matmulKernel<<<gridDim, blockDim>>>(a, b, result, m, n, k);
+    matmulKernel<<<gridDim, blockDim>>>(m, n, k, a, b, result);
 }
 
-void CUDA_sin(float* a, int n, float* result) {
+void CUDA_sin(int n, float* a, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    sinKernel<<<numBlocks, blockSize>>>(a, result, n);
+    sinKernel<<<numBlocks, blockSize>>>(n, a, result);
 }
 
-void CUDA_cos(float* a, int n, float* result) {
+void CUDA_cos(int n, float* a, float* result) {
     int blockSize = 256;
     int numBlocks = (n + blockSize - 1) / blockSize;
-    cosKernel<<<numBlocks, blockSize>>>(a, result, n);
+    cosKernel<<<numBlocks, blockSize>>>(n, a, result);
 }
 
 void CUDA_sum(Tensor* a, Tensor* result) {
     float* aData = a->data;
-
-
     float* resultData = result->data;
 
-    int* d_aShape;
-    int* d_resultStride;
-
-    reduceOpParameterGen(a, result, &d_aShape, &d_resultStride);
-
-    int dim = a->shape.size();
-
     int blockSize = 256;
-
     int numBlocks = (a->size + blockSize - 1) / blockSize;
-    sumKernel<<<numBlocks, blockSize>>>(aData, resultData, dim, d_aShape, d_resultStride, a->size);
-
-    cudaFree(d_aShape);
-    cudaFree(d_resultStride);
+    sumKernel<<<numBlocks, blockSize>>>(a->size, aData, resultData, a->dim, a->d_shape, result->dim, result->d_stride);
 }
 
 void CUDA_max(Tensor* a, Tensor* result) {
-
     float* aData = a->data;
     float* resultData = result->data;
-
-    int* d_aShape;
-    int* d_resultStride;
-
-    reduceOpParameterGen(a, result, &d_aShape, &d_resultStride);
-
-    int dim = a->shape.size();
 
     int blockSize = 256;
 
     int resultNumBlocks = (result->size + blockSize - 1) / blockSize;
-    fillKernel<<<resultNumBlocks, blockSize>>>(resultData, -1e10f, result->size);
+    fillKernel<<<resultNumBlocks, blockSize>>>(result->size, resultData, -1e10f);
 
     int numBlocks = (a->size + blockSize - 1) / blockSize;
-
-    maxKernel<<<numBlocks, blockSize>>>(aData, resultData, dim, d_aShape, d_resultStride, a->size);
+    maxKernel<<<numBlocks, blockSize>>>(a->size, aData, resultData, a->dim, a->d_shape, result->dim, result->d_stride);
 
     cudaDeviceSynchronize();
-
-    cudaFree(d_aShape);
-    cudaFree(d_resultStride);
 }
 
 void CUDA_min(Tensor* a, Tensor* result) {
     float* aData = a->data;
     float* resultData = result->data;
 
-    int* d_aShape;
-    int* d_resultStride;
-
-    reduceOpParameterGen(a, result, &d_aShape, &d_resultStride);
-
-    int dim = a->shape.size();
-
     int blockSize = 256;
 
     int resultNumBlocks = (result->size + blockSize - 1) / blockSize;
-    fillKernel<<<resultNumBlocks, blockSize>>>(resultData, 1e10f, result->size);
+    fillKernel<<<resultNumBlocks, blockSize>>>(result->size, resultData, 1e10f);
 
     int numBlocks = (a->size + blockSize - 1) / blockSize;
-
-    minKernel<<<numBlocks, blockSize>>>(aData, resultData, dim, d_aShape, d_resultStride, a->size);
+    minKernel<<<numBlocks, blockSize>>>(a->size, aData, resultData, a->dim, a->d_shape, result->dim, result->d_stride);
 
     cudaDeviceSynchronize();
-
-    cudaFree(d_aShape);
-    cudaFree(d_resultStride);
 }

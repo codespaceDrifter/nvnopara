@@ -22,14 +22,17 @@ static int _ = (srand(time(nullptr)),0);
 
 class Tensor {
 public:
-    Tensor(std::vector<int> shape);
+
+    Tensor(int* shape, int dim);
+    Tensor(std::initializer_list<int> shape)
+        : Tensor(const_cast<int*>(shape.begin()), static_cast<int>(shape.size())) {}
     
 
     // do NOT use these shape indexes for normal element OPs
     inline __attribute__((always_inline)) std::vector<int> flatToIndices (int data_idx){
         std::vector<int> result;
         int cur_group = data_idx;
-        for (int i = this->shape.size() - 1; i >= 0; --i){
+        for (int i = this->dim - 1; i >= 0; --i){
             result.insert(result.begin(), cur_group % this->shape[i]);
             cur_group = cur_group / this->shape[i];
         }
@@ -37,7 +40,7 @@ public:
     }
 
     inline __attribute__((always_inline)) float& idx (std::vector<int> indices_vec){
-        indices_vec.erase(indices_vec.begin(), indices_vec.begin() + indices_vec.size() - this->shape.size());
+        indices_vec.erase(indices_vec.begin(), indices_vec.begin() + indices_vec.size() - this->dim);
         int data_idx = 0;
         for (int i = 0; i < indices_vec.size(); ++i){
             data_idx += indices_vec[i] * this->stride[i];
@@ -51,7 +54,6 @@ public:
         return this->idx(indices_vec);
     }
 
-    Tensor* broadcast(std::vector<int> newShape);
 
     void toCPU();
     void toCUDA();
@@ -59,13 +61,17 @@ public:
     void randomize(float min, float max);
     void arrange(float start = 0, float step = 1);
     void print();
+    bool equal(Tensor* other);
 
     ~Tensor();
     
     float* data;
-    std::vector<int> shape;
     int size;
-    std::vector<int> stride;
+    int* shape;    // CPU shape
+    int* stride;   // CPU stride
+    int* d_shape;  // GPU shape
+    int* d_stride; // GPU stride
+    int dim;
     Device device;
 };
 

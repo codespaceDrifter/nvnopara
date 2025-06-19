@@ -1,33 +1,53 @@
 #include "tensor.hpp"
 
-Tensor::Tensor(std::vector<int> shape) {
-    this->shape = shape;
+
+Tensor::Tensor(int* shape, int dim) {
+    this->dim = dim;
+    
+    // Allocate memory for shape and stride arrays
+    this->shape = new int[this->dim];
+    this->stride = new int[this->dim];
+    
+    // Copy shape data
+    for (int i = 0; i < this->dim; i++) {
+        this->shape[i] = shape[i];
+    }
 
     this->size = 1;
-    for (int i = 0; i < shape.size(); i++) {
-        this->size *= shape[i];
+    for (int i = 0; i < this->dim; i++) {
+        this->size *= this->shape[i];
     }
 
     this->data = new float[this->size]();
 
-    this->stride = std::vector<int>(shape.size());
-    this->stride[shape.size() - 1] = 1;
-    for (int i = shape.size() - 2; i >= 0; i--) {
-        this->stride[i] = this->stride[i + 1] * shape[i + 1];
+    // Calculate stride
+    this->stride[this->dim - 1] = 1;
+    for (int i = this->dim - 2; i >= 0; i--) {
+        this->stride[i] = this->stride[i + 1] * this->shape[i + 1];
     }
-    for (int i = 0; i < shape.size(); i++) {
-        if (shape[i] == 1) {
+    for (int i = 0; i < this->dim; i++) {
+        if (this->shape[i] == 1) {
             this->stride[i] = 0;
         }
     }
+    
     this->device = Device::CPU;
+    this->d_shape = nullptr;
+    this->d_stride = nullptr;
 }
+
 
 Tensor::~Tensor() {
     if (this->device == Device::CPU) {
         delete[] this->data;
+        delete[] this->shape;
+        delete[] this->stride;
     } else if (this->device == Device::CUDA) {
         cudaFree(this->data);
+        delete[] this->shape;  // CPU copies
+        delete[] this->stride;
+        if (this->d_shape) cudaFree(this->d_shape);    // GPU copies
+        if (this->d_stride) cudaFree(this->d_stride);
     }
 }
 
@@ -49,24 +69,43 @@ void Tensor::toCPU() {
         case Device::CPU:
             break;
         case Device::CUDA:
+            // Move data back to CPU
             float* tempData = new float[this->size];
             cudaMemcpy(tempData, this->data, this->size * sizeof(float), cudaMemcpyDeviceToHost);
             cudaFree(this->data);
             this->data = tempData;
+            
+            // Clean up GPU shape and stride (CPU copies already exist)
+            if (this->d_shape) {
+                cudaFree(this->d_shape);
+                this->d_shape = nullptr;
+            }
+            if (this->d_stride) {
+                cudaFree(this->d_stride);
+                this->d_stride = nullptr;
+            }
+            
             break;
     }
 
     this->device = Device::CPU;
-    
 }
 
 void Tensor::toCUDA() {
     if (this->device == Device::CPU) {
+        // Move data to CUDA
         float* cudaData;
         cudaMalloc(&cudaData, this->size * sizeof(float));
         cudaMemcpy(cudaData, this->data, this->size * sizeof(float), cudaMemcpyHostToDevice);
-        delete[] this->data;  // Free the CPU memory
+        delete[] this->data;
         this->data = cudaData;
+        
+        // Create GPU copies of shape and stride (keep CPU copies)
+        cudaMalloc(&this->d_shape, this->dim * sizeof(int));
+        cudaMemcpy(this->d_shape, this->shape, this->dim * sizeof(int), cudaMemcpyHostToDevice);
+        
+        cudaMalloc(&this->d_stride, this->dim * sizeof(int));
+        cudaMemcpy(this->d_stride, this->stride, this->dim * sizeof(int), cudaMemcpyHostToDevice);
     }
     this->device = Device::CUDA;
 }
@@ -75,9 +114,9 @@ void Tensor::print(){
     assert(this->device == Device::CPU);
     //outputs the shape
     std::cout << "shape: (";
-    for (int i = 0; i < this->shape.size(); ++i) {
+    for (int i = 0; i < this->dim; ++i) {
         std::cout << this->shape[i];
-        if (i != this->shape.size() - 1) std::cout << ", ";
+        if (i != this->dim - 1) std::cout << ", ";
     }
     std::cout <<")"<<std::endl;
 
@@ -86,12 +125,12 @@ void Tensor::print(){
 
     std::string result;
 
-    if (this->shape.size() == 0 ) result = "";
+    if (this->dim == 0 ) result = "";
 
     // makes all the last dimension of the data into "[1,2,3]" formatted strings and put them in lineVec
     std::vector<std::string> lineVec;
     std::string tempStr;
-    int lastShape = this->shape[this->shape.size()-1];
+    int lastShape = this->shape[this->dim-1];
     for (int i = 0; i < this->size; ++i){
         if (lastShape == 1 || i != 0 && (i+1) % lastShape == 0){
             tempStr += std::to_string(this->data[i]);
@@ -107,7 +146,7 @@ void Tensor::print(){
     //the last two dimensions are like a matrix form
     //each dimension before that except the first divides the tensor and creates indents
     //uses max divide to not create a extra bracket at the end
-    for (int i = this->shape.size() - 2; i > 0; --i){
+    for (int i = this->dim - 2; i > 0; --i){
 
         int curDivide = this->shape[i];
         int curCount = 0;
@@ -121,7 +160,7 @@ void Tensor::print(){
         for (int j = 0; j < lineVec.size(); ++j) lineVec[j] = "  " + lineVec[j];
 
         for (int j = 0; j < lineVec.size(); ++j){
-            if (i == this->shape.size() -2) curCount++;
+            if (i == this->dim -2) curCount++;
             else if (lineVec[j] == "  ]") curCount++;
             if (curCount / curDivide == curDivideTimes && curCount % curDivide == 0 && curDivideTimes < curMaxDivides){
                 ++curDivideTimes;
@@ -142,22 +181,22 @@ void Tensor::print(){
     std::cout << result << std::endl;
 }
 
-
-Tensor* Tensor::broadcast(std::vector<int> newShape){
-    std::vector<int> thisPadded = this->shape;
-    std::vector<int> newPadded = newShape; 
-    thisPadded.insert(thisPadded.begin(), std::max(0, static_cast<int>(newPadded.size() - thisPadded.size()) ), 1);
-    newPadded.insert(newPadded.begin(), std::max(0, static_cast<int>(thisPadded.size() - newPadded.size())),1);
-
-    for (int i = 0; i < thisPadded.size(); i++){
-        assert(thisPadded[i] == newPadded[i] || thisPadded[i] == 1);
+bool Tensor::equal(Tensor* other) {
+    assert(this->device == Device::CPU);
+    assert(other->device == Device::CPU);
+    
+    if (this->dim != other->dim) return false;
+    if (this->size != other->size) return false;
+    
+    for (int i = 0; i < this->dim; i++) {
+        if (this->shape[i] != other->shape[i]) return false;
     }
-
-    Tensor* result = new Tensor(newShape);
-
-    for (int i = 0; i < result->size; i++){
-        std::vector<int> indices = result->flatToIndices(i);
-        result->data[i] = this->idx(indices);
+    
+    for (int i = 0; i < this->size; i++) {
+        if (abs(this->data[i] - other->data[i]) > 1e-6) return false;
     }
-    return result;
+    
+    return true;
 }
+
+

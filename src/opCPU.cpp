@@ -1,54 +1,54 @@
 #include "opCPU.hpp"
 
-void CPU_add(float* a, float* b, int n, float* result) {
+void CPU_add(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = a[i] + b[i];
     }
 }
 
-void CPU_sub(float* a, float* b, int n, float* result) {
+void CPU_sub(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = a[i] - b[i];
     }
 }
 
-void CPU_mul(float* a, float* b, int n, float* result) {
+void CPU_mul(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = a[i] * b[i];
     }
 }
 
-void CPU_div(float* a, float* b, int n, float* result) {
+void CPU_div(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = a[i] / b[i];
     }
 }
 
-void CPU_pow(float* a, float* b, int n, float* result) {
+void CPU_pow(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = std::pow(a[i], b[i]);
     }
 }
 
-void CPU_equal(float* a, float* b, int n, float* result) {
+void CPU_equal(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = a[i] == b[i];
     }
 }
 
-void CPU_lessThan(float* a, float* b, int n, float* result) {
+void CPU_lessThan(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = a[i] < b[i];
     }
 }
 
-void CPU_greaterThan(float* a, float* b, int n, float* result) {
+void CPU_greaterThan(int n, float* a, float* b, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = a[i] > b[i];
     }
 }
 
-void CPU_matmul(float* a, float* b, int m, int n, int k, float* result) {
+void CPU_matmul(int m, int n, int k, float* a, float* b, float* result) {
     for (int i = 0; i < m; i++) {           // For each row of A
         for (int j = 0; j < n; j++) {       // For each column of B
             float sum = 0.0f;
@@ -60,13 +60,13 @@ void CPU_matmul(float* a, float* b, int m, int n, int k, float* result) {
     }
 }
 
-void CPU_sin(float* a, int n, float* result) {
+void CPU_sin(int n, float* a, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = std::sin(a[i]);
     }
 }
 
-void CPU_cos(float* a, int n, float* result) {
+void CPU_cos(int n, float* a, float* result) {
     for (int i = 0; i < n; i++) {
         result[i] = std::cos(a[i]);
     }
