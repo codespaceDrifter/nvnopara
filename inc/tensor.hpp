@@ -8,10 +8,6 @@
 #include <cassert>
 #include <cuda_runtime.h>
 
-
-
-
-
 enum class Device {
     CPU,
     CUDA,
@@ -58,6 +54,10 @@ public:
     void toCPU();
     void toCUDA();
 
+    void transpose(int dim1, int dim2);
+    void squeeze (int dimIdx);
+    void unsqueeze (int dimIdx);
+
     void randomize(float min, float max);
     void arrange(float start = 0, float step = 1);
     void print();
@@ -69,8 +69,6 @@ public:
     int size;
     int* shape;    // CPU shape
     int* stride;   // CPU stride
-    int* d_shape;  // GPU shape
-    int* d_stride; // GPU stride
     int dim;
     Device device;
 };

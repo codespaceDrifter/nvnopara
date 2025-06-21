@@ -10,16 +10,28 @@ int main() {
 
     Tensor* a = new Tensor({2,2});
     a->arrange();
-    a->print();
 
     Tensor* b = new Tensor({2,2});
     b->arrange();
-    b->print();
+
 
     a->toCUDA();
     b->toCUDA();
 
-    Tensor* c = add(a, b);
+    Tensor* c = matmul(a, b);
+
+
+
+
+    Tensor* d = matmulByElemul(a, b);
+
+
+
+    delete a;
+    delete b;
+    delete c;
+    delete d;
+
 
     return 0;
 }

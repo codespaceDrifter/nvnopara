@@ -32,8 +32,6 @@ Tensor::Tensor(int* shape, int dim) {
     }
     
     this->device = Device::CPU;
-    this->d_shape = nullptr;
-    this->d_stride = nullptr;
 }
 
 
@@ -44,10 +42,8 @@ Tensor::~Tensor() {
         delete[] this->stride;
     } else if (this->device == Device::CUDA) {
         cudaFree(this->data);
-        delete[] this->shape;  // CPU copies
+        delete[] this->shape;
         delete[] this->stride;
-        if (this->d_shape) cudaFree(this->d_shape);    // GPU copies
-        if (this->d_stride) cudaFree(this->d_stride);
     }
 }
 
@@ -74,17 +70,6 @@ void Tensor::toCPU() {
             cudaMemcpy(tempData, this->data, this->size * sizeof(float), cudaMemcpyDeviceToHost);
             cudaFree(this->data);
             this->data = tempData;
-            
-            // Clean up GPU shape and stride (CPU copies already exist)
-            if (this->d_shape) {
-                cudaFree(this->d_shape);
-                this->d_shape = nullptr;
-            }
-            if (this->d_stride) {
-                cudaFree(this->d_stride);
-                this->d_stride = nullptr;
-            }
-            
             break;
     }
 
@@ -99,19 +84,78 @@ void Tensor::toCUDA() {
         cudaMemcpy(cudaData, this->data, this->size * sizeof(float), cudaMemcpyHostToDevice);
         delete[] this->data;
         this->data = cudaData;
-        
-        // Create GPU copies of shape and stride (keep CPU copies)
-        cudaMalloc(&this->d_shape, this->dim * sizeof(int));
-        cudaMemcpy(this->d_shape, this->shape, this->dim * sizeof(int), cudaMemcpyHostToDevice);
-        
-        cudaMalloc(&this->d_stride, this->dim * sizeof(int));
-        cudaMemcpy(this->d_stride, this->stride, this->dim * sizeof(int), cudaMemcpyHostToDevice);
     }
     this->device = Device::CUDA;
 }
 
+void Tensor::transpose(int dim1, int dim2){
+    assert(dim1 != dim2 && dim1 < this->dim && dim2 < this->dim);
+    int tempShape = this->shape[dim1];
+    this->shape[dim1] = this->shape[dim2];
+    this->shape[dim2] = tempShape;
+
+    int tempStride = this->stride[dim1];
+    this->stride[dim1] = this->stride[dim2];
+    this->stride[dim2] = tempStride;
+
+}
+
+void Tensor::squeeze(int dimIdx){
+    assert(dimIdx >= 0 && dimIdx < this->dim && this->shape[dimIdx] == 1);
+    int newDim = this->dim - 1;
+    int* newShape = new int[newDim];
+    int* newStride = new int[newDim];
+    for (int i = 0; i < dimIdx; ++i){
+        newShape[i] = this->shape[i];
+        newStride[i] = this->stride[i];
+    }
+    for (int i = dimIdx+1; i < this->dim; ++i){
+        newShape[i-1] = this->shape[i];
+        newStride[i-1] = this->stride[i];
+    }
+
+    delete[] this->shape;
+    delete[] this->stride;
+    this->shape = newShape;
+    this->stride = newStride;
+    this->dim = newDim;
+}
+
+void Tensor::unsqueeze(int dimIdx){
+    assert(dimIdx >= 0 && dimIdx <= this->dim);
+    int newDim = this->dim + 1;
+    int* newShape = new int[newDim];
+    int* newStride = new int[newDim];
+    for (int i = 0; i < dimIdx; ++i){
+        newShape[i] = this->shape[i];
+        newStride[i] = this->stride[i];
+    }
+    newShape[dimIdx] = 1;
+    newStride[dimIdx] = 0;
+    for (int i = dimIdx; i < this->dim; ++i){
+        newShape[i+1] = this->shape[i];
+        newStride[i+1] = this->stride[i];
+    }
+
+    delete[] this->shape;
+    delete[] this->stride;
+    this->shape = newShape;
+    this->stride = newStride;
+    this->dim = newDim;
+}
+
+
+
+
 void Tensor::print(){
-    assert(this->device == Device::CPU);
+
+    bool wasAtCUDA = false;
+
+    if (this->device == Device::CUDA){
+        wasAtCUDA = true;
+        this->toCPU();
+    }
+
     //outputs the shape
     std::cout << "shape: (";
     for (int i = 0; i < this->dim; ++i) {
@@ -133,12 +177,12 @@ void Tensor::print(){
     int lastShape = this->shape[this->dim-1];
     for (int i = 0; i < this->size; ++i){
         if (lastShape == 1 || i != 0 && (i+1) % lastShape == 0){
-            tempStr += std::to_string(this->data[i]);
+            tempStr += std::to_string(this->idx(this->flatToIndices(i)));
             tempStr = "[" + tempStr + "]";
             lineVec.push_back(tempStr);
             tempStr = "";
         } else {
-            tempStr = tempStr + std::to_string(this->data[i]) + ", ";
+            tempStr = tempStr + std::to_string(this->idx(this->flatToIndices(i))) + ", ";
         }
     }
 
@@ -178,7 +222,11 @@ void Tensor::print(){
         result = result + lineVec[i] + "\n";
     }
 
+    if (wasAtCUDA){
+        this->toCUDA();
+    }
     std::cout << result << std::endl;
+
 }
 
 bool Tensor::equal(Tensor* other) {

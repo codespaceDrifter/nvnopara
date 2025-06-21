@@ -14,8 +14,7 @@ Device opDevice (Tensor* a, Tensor* b);
 
 Tensor* assertReducibleCreate(Tensor* originalTensor, std::vector<int>newShape);
 
-Tensor* assertShapeSameCreate (Tensor* a, Tensor* b);
-
+Tensor* assertBroadcastableCreate (Tensor* a, Tensor* b);
 
 Tensor* add(Tensor* a, Tensor* b);
 
@@ -45,5 +44,6 @@ Tensor* max(Tensor* a, std::vector<int> axes);
 
 Tensor* min(Tensor* a, std::vector<int> axes);
 
+Tensor* matmulByElemul(Tensor* a, Tensor* b);
 
 #endif // OP_HPP

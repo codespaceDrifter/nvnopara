@@ -1,392 +1,265 @@
 #include <iostream>
 #include "tensor.hpp"
 #include <vector>
+#include <cmath>
 #include "op.hpp"
 
 int main() {
     bool allTestsPassed = true;
     
-    // Test CUDA add
+    // Create consistent tensors A and B outside all test blocks
+    // A is (1,2) for broadcasting test, B is (2,2)
+    Tensor* A = new Tensor({1,2});
+    A->data[0] = 1.0f;
+    A->data[1] = 2.0f;  // A = [1, 2]
+    
+    Tensor* B = new Tensor({2,2});
+    B->data[0] = 3.0f;
+    B->data[1] = 4.0f;
+    B->data[2] = 5.0f;
+    B->data[3] = 6.0f;  // B = [[3, 4], [5, 6]]
+    
+    // Move to CUDA once and keep them there
+    A->toCUDA();
+    B->toCUDA();
+    
+    // Test CUDA add: A + B
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(0, 1);  // [0, 1, 2, 3]
-        
-        Tensor* b = new Tensor({2,2});
-        b->arrange(1, 1);  // [1, 2, 3, 4]
-        
-        // Expected result: [1, 3, 5, 7]
         Tensor* expected = new Tensor({2,2});
-        expected->arrange(1, 2);
+        std::vector<float> expectedData = {4.0f, 6.0f, 6.0f, 8.0f};  // [[4, 6], [6, 8]]
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
+        }
         
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA add
-        Tensor* result = add(a, b);
+        Tensor* result = add(A, B);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "Add test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA subtract
+    // Test CUDA subtract: B - A
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(2, 1);  // [2, 3, 4, 5]
-        
-        Tensor* b = new Tensor({2,2});
-        b->arrange(0, 1);  // [0, 1, 2, 3]
-        
-        // Expected result: [2, 2, 2, 2]
         Tensor* expected = new Tensor({2,2});
-        for (int i = 0; i < expected->size; i++) {
-            expected->data[i] = 2.0f;
+        std::vector<float> expectedData = {2.0f, 2.0f, 4.0f, 4.0f};  // [[2, 2], [4, 4]]
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
         }
         
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA subtract
-        Tensor* result = sub(a, b);
+        Tensor* result = sub(B, A);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "Sub test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA multiply
+    // Test CUDA multiply: A * B
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(1, 1);  // [1, 2, 3, 4]
-        
-        Tensor* b = new Tensor({2,2});
-        b->arrange(2, 1);  // [2, 3, 4, 5]
-        
-        // Expected result: [2, 6, 12, 20]
         Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 2.0f;
-        expected->data[1] = 6.0f;
-        expected->data[2] = 12.0f;
-        expected->data[3] = 20.0f;
+        std::vector<float> expectedData = {3.0f, 8.0f, 5.0f, 12.0f};  // [[3, 8], [5, 12]]
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
+        }
         
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA multiply
-        Tensor* result = mul(a, b);
+        Tensor* result = mul(A, B);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "Mul test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA divide
+    // Test CUDA divide: B / A
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(4, 2);  // [4, 6, 8, 10]
-        
-        Tensor* b = new Tensor({2,2});
-        b->arrange(2, 1);  // [2, 3, 4, 5]
-        
-        // Expected result: [2, 2, 2, 2]
         Tensor* expected = new Tensor({2,2});
-        for (int i = 0; i < expected->size; i++) {
-            expected->data[i] = 2.0f;
+        std::vector<float> expectedData = {3.0f, 2.0f, 5.0f, 3.0f};  // [[3, 2], [5, 3]]
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
         }
         
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA divide
-        Tensor* result = div(a, b);
+        Tensor* result = div(B, A);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "Div test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA power
+    // Test CUDA power: A ^ B
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(2, 1);  // [2, 3, 4, 5]
-        
-        Tensor* b = new Tensor({2,2});
-        for (int i = 0; i < b->size; i++) {
-            b->data[i] = 2.0f;  // [2, 2, 2, 2]
+        Tensor* expected = new Tensor({2,2});
+        std::vector<float> expectedData = {1.0f, 16.0f, 1.0f, 64.0f};  // [[1^3, 2^4], [1^5, 2^6]]
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
         }
         
-        // Expected result: [4, 9, 16, 25]
-        Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 4.0f;
-        expected->data[1] = 9.0f;
-        expected->data[2] = 16.0f;
-        expected->data[3] = 25.0f;
-        
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA power
-        Tensor* result = pow(a, b);
+        Tensor* result = pow(A, B);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "Pow test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA equal
+    // Test CUDA equal: A == B
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(1, 1);  // [1, 2, 3, 4]
-        
-        Tensor* b = new Tensor({2,2});
-        b->data[0] = 1.0f;
-        b->data[1] = 5.0f;
-        b->data[2] = 3.0f;
-        b->data[3] = 7.0f;  // [1, 5, 3, 7]
-        
-        // Expected result: [1, 0, 1, 0]
         Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 1.0f;
-        expected->data[1] = 0.0f;
-        expected->data[2] = 1.0f;
-        expected->data[3] = 0.0f;
+        std::vector<float> expectedData = {0.0f, 0.0f, 0.0f, 0.0f};  // All false
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
+        }
         
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA equal
-        Tensor* result = equal(a, b);
+        Tensor* result = equal(A, B);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "Equal test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA lessThan
+    // Test CUDA lessThan: A < B
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(1, 1);  // [1, 2, 3, 4]
-        
-        Tensor* b = new Tensor({2,2});
-        b->data[0] = 2.0f;
-        b->data[1] = 2.0f;
-        b->data[2] = 5.0f;
-        b->data[3] = 3.0f;  // [2, 2, 5, 3]
-        
-        // Expected result: [1, 0, 1, 0]
         Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 1.0f;
-        expected->data[1] = 0.0f;
-        expected->data[2] = 1.0f;
-        expected->data[3] = 0.0f;
+        std::vector<float> expectedData = {1.0f, 1.0f, 1.0f, 1.0f};  // All true
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
+        }
         
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA lessThan
-        Tensor* result = lessThan(a, b);
+        Tensor* result = lessThan(A, B);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "LessThan test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA greaterThan
+    // Test CUDA greaterThan: B > A
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(1, 1);  // [1, 2, 3, 4]
-        
-        Tensor* b = new Tensor({2,2});
-        b->data[0] = 2.0f;
-        b->data[1] = 2.0f;
-        b->data[2] = 2.0f;
-        b->data[3] = 3.0f;  // [2, 2, 2, 3]
-        
-        // Expected result: [0, 0, 1, 1]
         Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 0.0f;
-        expected->data[1] = 0.0f;
-        expected->data[2] = 1.0f;
-        expected->data[3] = 1.0f;
+        std::vector<float> expectedData = {1.0f, 1.0f, 1.0f, 1.0f};  // All true
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
+        }
         
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA greaterThan
-        Tensor* result = greaterThan(a, b);
+        Tensor* result = greaterThan(B, A);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "GreaterThan test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA matmul
+    // Test CUDA sin: sin(A)
     {
-        Tensor* a = new Tensor({2,2});
-        a->arrange(1, 1);  // [1, 2, 3, 4]
+        Tensor* expected = new Tensor({1,2});
+        std::vector<float> expectedData = {(float)sin(1.0f), (float)sin(2.0f)};
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
+        }
         
-        Tensor* b = new Tensor({2,2});
-        b->arrange(1, 1);  // [1, 2, 3, 4]
-        
-        // Expected result: [7, 10, 15, 22] for matrix multiplication
-        Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 7.0f;
-        expected->data[1] = 10.0f;
-        expected->data[2] = 15.0f;
-        expected->data[3] = 22.0f;
-        
-        // Move to CUDA
-        a->toCUDA();
-        b->toCUDA();
-        
-        // Perform CUDA matmul
-        Tensor* result = matmul(a, b);
+        Tensor* result = sin(A);
         result->toCPU();
         
-        // Test
         if (!result->equal(expected)) {
+            std::cout << "Sin test failed" << std::endl;
             allTestsPassed = false;
         }
         
-        delete a;
-        delete b;
         delete expected;
         delete result;
     }
     
-    // Test CUDA sin
+    // Test CUDA cos: cos(B)
     {
-        Tensor* a = new Tensor({2,2});
-        a->data[0] = 0.0f;
-        a->data[1] = 1.5708f;  // pi/2
-        a->data[2] = 3.1416f;  // pi
-        a->data[3] = 4.7124f;  // 3*pi/2
-        
-        // Expected result: [0, 1, 0, -1]
         Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 0.0f;
-        expected->data[1] = 1.0f;
-        expected->data[2] = 0.0f;
-        expected->data[3] = -1.0f;
-        
-        // Move to CUDA
-        a->toCUDA();
-        
-        // Perform CUDA sin
-        Tensor* result = sin(a);
-        result->toCPU();
-        
-        // Test (using looser tolerance for trigonometric functions)
-        for (int i = 0; i < result->size; i++) {
-            if (abs(result->data[i] - expected->data[i]) > 1e-3) {
-                allTestsPassed = false;
-                break;
-            }
+        std::vector<float> expectedData = {(float)cos(3.0f), (float)cos(4.0f), (float)cos(5.0f), (float)cos(6.0f)};
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
         }
         
-        delete a;
+        Tensor* result = cos(B);
+        result->toCPU();
+        
+        if (!result->equal(expected)) {
+            std::cout << "Cos test failed" << std::endl;
+            allTestsPassed = false;
+        }
+        
         delete expected;
         delete result;
     }
     
-    // Test CUDA cos
+    // Test CUDA matmul: A.T @ B (need to create proper matrices for matmul)
     {
-        Tensor* a = new Tensor({2,2});
-        a->data[0] = 0.0f;
-        a->data[1] = 1.5708f;  // pi/2
-        a->data[2] = 3.1416f;  // pi
-        a->data[3] = 4.7124f;  // 3*pi/2
+        // Create 2x2 matrices for matmul test
+        Tensor* matA = new Tensor({2,2});
+        matA->data[0] = 1.0f; matA->data[1] = 2.0f;
+        matA->data[2] = 3.0f; matA->data[3] = 4.0f;  // [[1, 2], [3, 4]]
         
-        // Expected result: [1, 0, -1, 0]
+        Tensor* matB = new Tensor({2,2});  
+        matB->data[0] = 5.0f; matB->data[1] = 6.0f;
+        matB->data[2] = 7.0f; matB->data[3] = 8.0f;  // [[5, 6], [7, 8]]
+        
         Tensor* expected = new Tensor({2,2});
-        expected->data[0] = 1.0f;
-        expected->data[1] = 0.0f;
-        expected->data[2] = -1.0f;
-        expected->data[3] = 0.0f;
-        
-        // Move to CUDA
-        a->toCUDA();
-        
-        // Perform CUDA cos
-        Tensor* result = cos(a);
-        result->toCPU();
-        
-        // Test (using looser tolerance for trigonometric functions)
-        for (int i = 0; i < result->size; i++) {
-            if (abs(result->data[i] - expected->data[i]) > 1e-3) {
-                allTestsPassed = false;
-                break;
-            }
+        std::vector<float> expectedData = {19.0f, 22.0f, 43.0f, 50.0f};  // [[19, 22], [43, 50]]
+        for (int i = 0; i < expectedData.size(); i++) {
+            expected->data[i] = expectedData[i];
         }
         
-        delete a;
+        matA->toCUDA();
+        matB->toCUDA();
+        
+        Tensor* result = matmul(matA, matB);
+        result->toCPU();
+        
+        if (!result->equal(expected)) {
+            std::cout << "Matmul test failed" << std::endl;
+            allTestsPassed = false;
+        }
+        
+        delete matA;
+        delete matB;
         delete expected;
         delete result;
     }
+    
+    // Clean up main tensors
+    delete A;
+    delete B;
     
     if (allTestsPassed) {
         std::cout << "All tests passed" << std::endl;
@@ -396,4 +269,3 @@ int main() {
     
     return 0;
 }
-

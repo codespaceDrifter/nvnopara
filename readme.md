@@ -1,14 +1,17 @@
 C++ library that does Tensor Calculations  
 nvnopara stands for nano parallel: a minimum functionality library that stills allow GPU tensor ops
 Targets CUDA or CPU  
-there are NO views, every tensor memory is contiguous
+there are NO views, every tensor owns its own memory 
 there are NO codegen. element op kernels are fused with abstract syntax tree and switch op statements. 
 
 used in my svmbolsolve, phvsicsim, and mvndspace libraries  
 
 
-#to do
-1: kernel fusion
+#to do  
+
+0: fix transpose, fix the matmulElemul function and speed test
+
+1: kernel fusion  
 __global__ void fusedKernel(float* inputs[], float* result, int n, int* ops, int numOps) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n) {
@@ -28,7 +31,7 @@ __global__ void fusedKernel(float* inputs[], float* result, int n, int* ops, int
     }
 }
 
-2: allow broadcasting, but do it with checks like a bool passed in whether to use broadcasting or not
-bool needsBroadcast
 
-3: tiled matmul
+2: tiled matmul  
+
+3: specialized functions i.e. mesh collision
